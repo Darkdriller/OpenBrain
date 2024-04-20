@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>3D Plot</title>
+</head>
+<body>
+    <h1>3D Plot</h1>
+    <div id="plot"></div>
+    
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script>
+        var graphJSON = JSON.parse('{{ graph_json|tojson|safe}}');
+        Plotly.newPlot('neuron-plot', graphJSON);
+    </script>
+    <!-- <script>
+        // Generate random data for demonstration
+        var x = [1, 2, 3, 4, 5];
+        var y = [1, 2, 3, 4, 5];
+        var z = [1, 2, 3, 4, 5];
+
+        // Create a trace
+        var trace = {
+            x: x,
+            y: y,
+            z: z,
+            mode: 'markers',
+            type: 'scatter3d',
+            marker: {
+                size: 5,
+                color: 'blue'
+            }
+        };
+
+        // Create data array
+        var data = [trace];
+
+        // Create layout
+        var layout = {
+            scene: {
+                camera: {
+                    eye: {
+                        x: 1.25,
+                        y: 1.25,
+                        z: 1.25
+                    }
+                }
+            }
+        };
+
+        // Plot the graph
+        Plotly.newPlot('plot', data, layout);
+
+        // Add event listener for click events on the graph
+        document.getElementById('plot').on('plotly_click', function(data) {
+            var point = data.points[0];
+            var coordinates = {
+                x: point.x,
+                y: point.y,
+                z: point.z
+            };
+            console.log(coordinates);
+        });
+    </script> -->
+
+    <!-- For demonstration, let's assume user manually enters points in a form -->
+    <form action="/export_points" method="post">
+        <label for="points">Enter Points (x,y,z; separated by commas, one per line):</label><br>
+        <textarea name="points[]" rows="5"></textarea><br>
+        <input type="submit" value="Export Points">
+    </form>
+</body>
+</html>

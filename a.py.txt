@@ -1,0 +1,31 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+def read_swc(file_path):
+    """Read SWC file and extract data."""
+    data = []
+    with open(file_path, 'r') as f:
+        for line in f:
+            if line.startswith('#'):
+                continue
+            parts = line.split()
+            if len(parts) != 7:
+                continue
+            data.append([int(parts[0]), float(parts[2]), float(parts[3]), float(parts[4]), float(parts[5])])
+    return np.array(data)
+
+def plot_neuron(swc_data):
+    """Plot neuron morphology."""
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(swc_data[:, 2], swc_data[:, 3], swc_data[:, 4], c='b', marker='o')
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+    plt.show()
+
+# Example usage
+if __name__ == "__main__":
+    swc_file = r"C:\Users\Akhbar\Downloads\OpenBrain-main\OpenBrain-main\files\BG001.swc"
+    swc_data = read_swc(swc_file)
+    plot_neuron(swc_data)
