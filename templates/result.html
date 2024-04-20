@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiple Plots</title>
+    <!-- Include Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body style="background-color: black;">
+    {% for plot in plots %}
+    <div id="plot{{ loop.index }}" style="background-color: black;"></div>
+    <script>
+        var data{{ loop.index }} = {{ plot.traces | tojson }};
+        var layout{{ loop.index }} = {
+            title: '{{ ["Area of Vessel", "Pressure", "Flow Rate", "Velocity"][loop.index - 1] }}',
+            xaxis: {
+                title: 'Time',
+                color: 'white'
+            },
+            yaxis: {
+                title: '{{ ["Area of Vessel", "Pressure", "Flow Rate", "Velocity"][loop.index - 1] }}',
+                color: 'white',
+                range: [Math.min.apply(null, [].concat.apply([], data{{ loop.index }}.map(function(trace) { return trace.y; }))),
+                        Math.max.apply(null, [].concat.apply([], data{{ loop.index }}.map(function(trace) { return trace.y; })))],
+            },
+            plot_bgcolor: 'black',
+            paper_bgcolor: 'black'
+        };
+        Plotly.newPlot('plot{{ loop.index }}', data{{ loop.index }}, layout{{ loop.index }});
+    </script>
+    {% endfor %}
+</body>
+</html>

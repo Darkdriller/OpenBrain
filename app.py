@@ -1,18 +1,15 @@
 from flask import Flask, request, render_template, redirect, url_for, send_file
-import plotly
-import plotly.graph_objs as go
-import pandas as pd
-import csv
+import subprocess
 import os
 import json
 import time
-import graph # Import the functions from graph.py
+import random
 
 app = Flask(__name__)
 
 # Configurations for file uploads
-UPLOAD_FOLDER = 'uploads'
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'nii'}
+UPLOAD_FOLDER = r"C:\Users\Akhbar\Downloads\OpenBrain-main\OpenBrain-main\uploads"
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'nii','gz'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Ensure the upload folder exists
@@ -42,13 +39,32 @@ def upload_file():
 
 @app.route('/display_graph/<filename>')
 def display_graph(filename):
-    # Here you would generate your 3D plot based on the uploaded file
-    # For demonstration, we're generating a static 3D scatter plot
-    filename = 'path/to/your/neuron_data.swc'
-    neuron_data = graph.read_swc(filename)
-    fig = graph.plot_neuron(neuron_data)
-    graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
-    return render_template('display_graph.html', graphJSON=graphJSON)
+    # Instead of plotting, execute MATLAB script
+    matlab_script = "C:/Users/Akhbar/Downloads/OpenBrain-main/OpenBrain-main/fin.m"
+    command = ['matlab', '-batch', 'run(\'{}\')'.format(matlab_script)]
+    subprocess.call(command)
+    # Redirect to the result route after executing the script
+    return redirect(url_for('result'))
+
+@app.route('/result')
+def result():
+    # Define the directory path
+    directory = r'C:\Users\Akhbar\Downloads\OpenBF Results\Flow-000'
+
+    # Randomly select one of the prefixes
+    selected_prefix = random.choice([f'v{i}' for i in range(5,11)])
+
+    # Find all files with the selected prefix
+    selected_files = [f for f in os.listdir(directory) if f.startswith(selected_prefix) and not f.endswith('_c.last')]
+
+    # Plot each selected file
+    plots = []
+    for file_name in selected_files:
+        file_path = os.path.join(directory, file_name)
+        data = read_data_from_file(file_path)
+        plots.append(plot_data(data, file_name))
+
+    return render_template('result.html', plots=plots)
 
 @app.route('/export_points', methods=['POST'])
 def export_points():
@@ -63,6 +79,31 @@ def export_points():
                      mimetype='text/csv',
                      attachment_filename='selected_points.csv',
                      as_attachment=True)
+
+def read_data_from_file(file_path):
+    data = []
+    with open(file_path, 'r') as file:
+        for line in file:
+            row = [float(value) for value in line.strip().split()]
+            data.append(row)
+    return data
+
+def plot_data(data, file_name):
+    # Extract time values and flow values
+    time = [row[0] for row in data]
+    flows = [[row[i] for row in data] for i in range(1, len(data[0]))]
+
+    # Create traces for each flow
+    traces = []
+    for i, flow in enumerate(flows):
+        traces.append({
+            'x': time,
+            'y': flow,
+            'mode': 'lines+markers',
+            'name': f'Flow {i + 1}'
+        })
+
+    return {'file_name': file_name, 'traces': traces}
 
 if __name__ == '__main__':
     app.run(debug=True)

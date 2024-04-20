@@ -3,24 +3,48 @@
 <head>
     <title>Upload MRA File</title>
     <style>
-        /* Simple loading overlay */
-        #loadingOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            color: white;
-            display: none;
+        /* Background with watermark effect */
+        body {
+            background-image: url('https://wallpapercave.com/wp/wp5670198.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            position: relative;
+            min-height: 100vh;
+        }
+        /* Logo text style */
+        .logo-text {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-family: 'Arial', sans-serif; /* Choose your desired font */
+            font-weight: bold;
+            color: #fff; /* Choose your desired color */
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 2px rgba(0,0,0,0.3); /* Add text shadow for depth */
+            z-index: 1000; /* Ensure it appears above other content */
+        }
+        /* Container to center content */
+        .container {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
+            height: 100vh;
         }
-        
+        /* Box for content with slight transparency */
+        .content-box {
+            background-color: rgba(255, 255, 255, 0.8); /* Adjust opacity as needed */
+            padding: 20px;
+            border-radius: 10px;
+            animation: slideUp 0.5s ease-out 0.6s forwards; /* Animation properties */
+            opacity: 0; /* Initially hidden */
+        }
         /* Custom styles for the file upload button */
-        .file-upload {
-            display: inline-block;
+        .file-upload, .submit-button {
             padding: 8px 12px;
             background-color: #4CAF50;
             color: white;
@@ -28,31 +52,50 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 16px;
+            margin-bottom: 10px;
         }
-        
-        /* Custom styles for the submit button */
-        .submit-button {
-            display: inline-block;
-            padding: 8px 12px;
-            background-color: #008CBA;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
+        /* Center form */
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Animation keyframes */
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0%);
+                opacity: 1;
+            }
         }
     </style>
 </head>
 <body>
-    <div id="loadingOverlay"><p>Loading...</p></div>
-    <h1>Upload MRA File</h1>
-    <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-        <input type="file" name="file" accept=".nii" class="file-upload">
-        <input type="submit" value="Upload" class="submit-button">
-    </form>
+    <h1 class="logo-text">
+        <span style="font-size: 48px;">O</span>pen<span style="font-size: 48px;">B</span>rain
+    </h1>
+    <div class="container">
+        <div class="content-box">
+            <h1>Upload MRA File</h1>
+            <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+                <input type="file" name="file" accept=".nii" class="file-upload">
+                <input type="submit" value="Upload" class="submit-button">
+            </form>
+        </div>
+    </div>
+    <div id="overlay"></div>
     <script>
+        // Slowly display the page after background image has loaded
+        window.onload = function() {
+            document.body.style.opacity = '1';
+        };
+        // Display loading overlay on form submit
         document.getElementById('uploadForm').onsubmit = function() {
-            document.getElementById('loadingOverlay').style.display = 'flex';
+            document.getElementById('overlay').style.display = 'flex';
         };
     </script>
 </body>
